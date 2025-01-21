@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Enrollment Form</title>
+    <style>
+        /* Add your CSS here for modern styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Student Enrollment Form</h1>
+    <form id="enrollmentForm">
+        <label for="paid">Paid:</label>
+        <select id="paid" name="paid" required>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+        
+        <!-- Parent Information -->
+        <label for="fatherName">Full Name of Father:</label>
+        <input type="text" id="fatherName" name="fatherName" required>
+        
+        <label for="motherName">Full Name of Mother:</label>
+        <input type="text" id="motherName" name="motherName" required>
+        
+        <label for="streetAddress">Street Address:</label>
+        <input type="text" id="streetAddress" name="streetAddress" required>
+        
+        <label for="suburb">Suburb:</label>
+        <input type="text" id="suburb" name="suburb" required>
+        
+        <label for="postcode">Postcode:</label>
+        <input type="text" id="postcode" name="postcode" required>
+        
+        <label for="mobile">Mobile Number:</label>
+        <input type="text" id="mobile" name="mobile" required>
+        
+        <label for="emergencyPhone">Emergency Phone Number:</label>
+        <input type="text" id="emergencyPhone" name="emergencyPhone" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <!-- Children Information -->
+        <label for="numChildren">Number of Children:</label>
+        <select id="numChildren" name="numChildren">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+        </select>
+        
+        <div id="childrenContainer"></div>
+        
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // Code to dynamically add child input fields
+        const numChildrenField = document.getElementById('numChildren');
+        const childrenContainer = document.getElementById('childrenContainer');
+
+        numChildrenField.addEventListener('change', () => {
+            const numChildren = parseInt(numChildrenField.value, 10) || 0;
+            childrenContainer.innerHTML = ''; // Clear existing fields
+
+            for (let i = 1; i <= numChildren; i++) {
+                childrenContainer.innerHTML += `
+                    <fieldset>
+                        <legend>Child ${i}</legend>
+                        <label for="childGivenNames${i}">Given Names:</label>
+                        <input type="text" id="childGivenNames${i}" name="childGivenNames${i}" required>
+
+                        <label for="childLastName${i}">Last Name:</label>
+                        <input type="text" id="childLastName${i}" name="childLastName${i}" required>
+
+                        <label for="childGender${i}">Gender:</label>
+                        <select id="childGender${i}" name="childGender${i}">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+
+                        <label for="childDob${i}">Date of Birth:</label>
+                        <input type="date" id="childDob${i}" name="childDob${i}" required>
+                    </fieldset>
+                `;
+            }
+        });
+
+        // Submit handler to send data to Google Sheets
+        document.getElementById('enrollmentForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            const jsonData = { /* Processed Data as Explained Earlier */ };
+
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbx94j-T2nu8VOdathZhNHGhyOEqhrVw8Jl2JAnVoaRm0Wfbbak0GxExh0lKBVxwQr_y/exec', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                if (response.ok) {
+                    alert('Data recorded successfully!');
+                    event.target.reset();
+                } else {
+                    alert('Failed to record data. Try again.');
+                }
+            } catch (error) {
+                alert('Error: Unable to connect to Google Sheets.');
+            }
+        });
+    </script>
+</body>
+</html>
